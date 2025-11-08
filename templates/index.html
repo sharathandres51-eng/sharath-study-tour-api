@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ESADE Study Tour Planner</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #a8edea, #3b82f6);
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      transition: 0.3s ease;
+    }
+    .logo {
+      font-size: 38px;
+      color: #3b82f6;
+      font-weight: 600;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+      font-weight: 600;
+    }
+    input, select {
+      width: 100%;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: 0.2s;
+    }
+    input:focus, select:focus {
+      border-color: #3b82f6;
+    }
+    button {
+      margin-top: 10px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: 0.2s;
+      width: 100%;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 17px;
+      color: #333;
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 15px;
+      min-height: 50px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2><span class="logo">🎓</span> ESADE Study Tour Planner</h2>
+
+    <input type="number" id="budgetInput" placeholder="Enter your budget (€)" /><br>
+    <button onclick="suggestTour()">Suggest Tour</button>
+
+    <select id="destinationSelect" style="margin-top:15px;">
+      <option value="">Select a destination</option>
+      <option value="bilbao">Bilbao</option>
+      <option value="stgallen">St Gallen</option>
+      <option value="milan">Milan</option>
+      <option value="bangalore">Bangalore</option>
+      <option value="singapore">Singapore</option>
+      <option value="seoul">Seoul</option>
+      <option value="sanfrancisco">San Francisco</option>
+    </select><br>
+
+    <button onclick="estimateBudget()">Estimate Budget</button>
+    <button onclick="getRestaurants()">Find Restaurant</button>
+
+    <div class="result" id="resultBox">Your result will appear here...</div>
+  </div>
+
+  <script>
+    async function suggestTour() {
+      const budget = document.getElementById("budgetInput").value;
+      const res = await fetch(`/suggest_tour?budget=${budget}`);
+      const data = await res.json();
+
+      if (data.error || data.message?.includes("low")) {
+        document.getElementById("resultBox").innerHTML = `<p>${data.error || data.message}</p>`;
+        return;
+      }
+
+      document.getElementById("resultBox").innerHTML = `
+        <strong>🎯 Destination Suggestion</strong><br>
+        With <strong>€${data.budget_eur}</strong>, you can experience <strong>${data.suggested_destination}</strong>!
+      `;
+    }
+
+    async function estimateBudget() {
+      const dest = document.getElementById("destinationSelect").value;
+      const res = await fetch(`/estimate_budget?destination=${dest}`);
+      const data = await res.json();
+
+      if (data.error) {
+        document.getElementById("resultBox").innerHTML = `<p>${data.error}</p>`;
+        return;
+      }
+
+      document.getElementById("resultBox").innerHTML = `
+        <strong>💰 Estimated Budget</strong><br>
+        ${data.destination}: <strong>€${data.estimated_budget_eur}</strong>
+      `;
+    }
+
+    async function getRestaurants() {
+      const dest = document.getElementById("destinationSelect").value;
+      const res = await fetch(`/restaurant?destination=${dest}`);
+      const data = await res.json();
+
+      if (data.error) {
+        document.getElementById("resultBox").innerHTML = `<p>${data.error}</p>`;
+        return;
+      }
+
+      document.getElementById("resultBox").innerHTML = `
+        <strong>🍽️ Restaurant Suggestion</strong><br>
+        While in <strong>${data.destination}</strong>, visit <strong>${data.recommended_restaurant}</strong>.
+      `;
+    }
+  </script>
+</body>
+</html>
