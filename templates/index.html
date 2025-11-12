@@ -96,6 +96,22 @@
 
     <button onclick="estimateBudget()">Estimate Budget</button>
     <button onclick="getRestaurants()">Find Restaurant</button>
+    
+    <hr style="margin:15px 0; opacity:0.3;">
+    <h3 style="margin-bottom:8px;">Plan a Full Trip ✈️</h3>
+
+    <input type="number" id="tripBudget" placeholder="Trip budget (€)" />
+    <input type="number" id="tripDays" placeholder="Trip duration (days)" style="margin-top:8px;"/>
+
+    <select id="tripPref" style="margin-top:8px;">
+      <option value="">Select preference</option>
+      <option value="food">Food</option>
+      <option value="culture">Culture</option>
+      <option value="nature">Nature</option>
+      <option value="nightlife">Nightlife</option>
+    </select>
+
+    <button onclick="planTrip()">Plan Trip ✨</button>
 
     <div class="result" id="resultBox">Your result will appear here...</div>
   </div>
@@ -147,6 +163,39 @@
         <strong>🍽️ Restaurant Suggestion</strong><br>
         While in <strong>${data.destination}</strong>, visit <strong>${data.recommended_restaurant}</strong>.
       `;
+    }
+
+    async function planTrip() {
+      const budget = document.getElementById("tripBudget").value;
+      const days = document.getElementById("tripDays").value;
+      const pref = document.getElementById("tripPref").value;
+
+      if (!budget || !days || !pref) {
+        document.getElementById("resultBox").innerHTML = "⚠️ Please fill all trip details.";
+        return;
+      }
+
+      document.getElementById("resultBox").innerHTML = "✨ Planning your study tour...";
+
+      try {
+        const res = await fetch(`/plan_trip?budget=${budget}&days=${days}&preference=${pref}`);
+        const data = await res.json();
+
+        if (data.destination) {
+          document.getElementById("resultBox").innerHTML = `
+            <strong>🌍 Trip Planned!</strong><br><br>
+            <strong>Destination:</strong> ${data.destination}<br>
+            <strong>Estimated Cost:</strong> €${data.estimated_total_cost_eur}<br>
+            <strong>Restaurant:</strong> ${data.restaurant}<br><br>
+            <strong>📍 Itinerary:</strong><br>
+            ${data.itinerary.map(d => "• " + d).join("<br>")}
+          `;
+        } else {
+          document.getElementById("resultBox").innerHTML = `<p>${data.message || "❌ No plan found."}</p>`;
+        }
+      } catch {
+        document.getElementById("resultBox").innerHTML = "❌ Server error while planning trip.";
+      }
     }
   </script>
 </body>
