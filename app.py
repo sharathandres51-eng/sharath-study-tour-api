@@ -52,5 +52,68 @@ def restaurant():
         "recommended_restaurant": restaurant_name
     })
 
+# Endpoint that plans a full trip based on budget, days, and preference
+@app.route('/plan_trip')
+def plan_trip():
+    try:
+        budget = float(request.args.get('budget', 0))
+        days = int(request.args.get('days', 0))
+        preference = request.args.get('preference', '').lower()
+
+    except ValueError:
+        return jsonify({"error": "Invalid budget or days parameter."}), 400
+
+    if days <= 0:
+        return jsonify({"error": "Days must be greater than 0."}), 400
+
+    # Filter destinations within budget
+    affordable_destinations = {
+        dest: cost for dest, cost in destinations.items() if cost <= budget
+    }
+
+    if not affordable_destinations:
+        return jsonify({"message": "No destination fits the budget."}), 200
+
+    # Prioritize match based on preference weight
+    selected_dest = random.choice(list(affordable_destinations.keys()))
+
+    # Estimate cost using a formula
+    daily_cost = 60  # default assumption
+    estimated_total = affordable_destinations[selected_dest] + (days * daily_cost)
+
+    # Generate sample itinerary
+    itinerary = [
+        f"Day {i+1}: Experience {preference} activities in {selected_dest.title()}"
+        for i in range(days)
+    ]
+
+    # Pick restaurant based on destination
+    restaurant_choice = random.choice(restaurants[selected_dest])
+
+    return jsonify({
+        "destination": selected_dest.title(),
+        "estimated_total_cost_eur": estimated_total,
+        "restaurant": restaurant_choice,
+        "itinerary": itinerary,
+        "message": f"Trip planned to {selected_dest.title()}!"
+    })
+
+
+
+@app.route('/health')
+def health_check():
+    try:
+        len(destinations)  # quick sanity check
+        return jsonify({
+            "status": "OK",
+            "message": "Study Tour API is up and running!"
+        }), 200
+    except Exception as e:
+        # if something goes wrong internally
+        return jsonify({
+            "status": "ERROR",
+            "message": f"Health check failed: {str(e)}"
+        }), 500
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)
