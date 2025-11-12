@@ -1,4 +1,4 @@
-# 🌍 ESADE Study Tour Planner API
+# ESADE Study Tour Planner API
 
 A simple **Flask API** that helps users plan trips by suggesting destinations, estimating costs, finding restaurants, and generating daily itineraries based on travel preferences.
 
@@ -16,16 +16,16 @@ A simple **Flask API** that helps users plan trips by suggesting destinations, e
 |-----------|---------|-------------|
 | `/suggest-tour` | `GET` | Suggests a destination by budget |
 | `/estimate-budget` | `POST` | Returns estimated total cost |
-| `/find-restaurant` | `POST` | Finds a restaurant for a city |
+| `restaurant` | `POST` | Finds a restaurant for a city |
 | `/plan-trip` | `POST` | Generates a full trip plan |
 | `/health` | `POST` | Returns the health status of the API |
 
 ## Setup (This can be used to replicate in an EC2 Instance as well)
 
 ```bash
-git clone <repo-url>
-cd <project-folder>
+git clone https://github.com/sharathandres51-eng/sharath-study-tour-api.git
+cd sharath-study-tour-api
 python3 -m venv venv
-source venv/bin/activate   # or venv\Scripts\activate on Windows
+source venv/bin/activate
 pip install Flask
 python app.py
