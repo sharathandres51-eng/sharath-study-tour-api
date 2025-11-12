@@ -25,6 +25,8 @@ A simple **Flask API** that helps users plan trips by suggesting destinations, e
 ```bash
 git clone https://github.com/sharathandres51-eng/sharath-study-tour-api.git
 cd sharath-study-tour-api
+sudo apt update
+sudo apt install python3.12-venv -y
 python3 -m venv venv
 source venv/bin/activate
 pip install Flask
