@@ -1,4 +1,6 @@
-#Destinations data source
+import random
+
+# Destinations data source
 destinations = {
     "bilbao": 250,
     "stgallen": 500,
@@ -9,7 +11,7 @@ destinations = {
     "sanfrancisco": 1800
 }
 
-#Restaurants data source
+# Restaurants data source
 restaurants = {
     "bilbao": ["La Viña del Ensanche", "Café Iruña", "Basquery"],
     "stgallen": ["Basilikum", "Netts Kafi", "Ristorante La Vigna"],
@@ -20,17 +22,7 @@ restaurants = {
     "sanfrancisco": ["Tartine Manufactory", "Burma Love", "House of Nanking"]
 }
 
-restaurants = {
-    "bilbao": ["La Viña del Ensanche", "Nerua", "Asador Indusi"],
-    "stgallen": ["Einstein Gourmet", "Netts Schützengarten", "Marktplatz"],
-    "milan": ["Luini Panzerotti", "Nobu Milano", "Trattoria Milanese"],
-    "bangalore": ["MTR", "Toit", "Vidyarthi Bhavan"],
-    "singapore": ["Hawker Chan", "Jumbo Seafood", "Din Tai Fung"],
-    "seoul": ["Myeongdong Kyoja", "Gwangjang Market", "Jungsik"],
-    "sanfrancisco": ["Tartine Bakery", "The Slanted Door", "House of Prime Rib"]
-}
-
-#User preferences data source
+# User preferences data source
 preferences = {
     "bilbao": {
         "food": ["pintxos crawl", "local seafood tour", "Basque cooking workshop"],
@@ -76,7 +68,7 @@ preferences = {
     }
 }
 
-#Function to get destination by budget
+# Function to get destination by budget
 def get_destination_by_budget(budget: float):
     """Return the most suitable destination for a given budget."""
     possible = [d for d, cost in destinations.items() if cost <= budget]
@@ -84,7 +76,7 @@ def get_destination_by_budget(budget: float):
         return None
     return max(possible, key=lambda d: destinations[d])
 
-#Function to generate itinerary based on user preference
+# Function to generate itinerary based on user preferences
 def generate_itinerary(city, preference, days):
     if city not in preferences or preference not in preferences[city]:
         # Default activities if city or preference not found
@@ -92,9 +84,15 @@ def generate_itinerary(city, preference, days):
     else:
         activities = preferences[city][preference]
 
-    itinerary = []
-    for i in range(days):
-        activity = random.choice(activities)
-        itinerary.append(f"Day {i+1}: {activity.title()} in {city.title()}")
+    # Shuffle activities for randomness
+    random.shuffle(activities)
+
+    # Repeat the shuffled list if there are more days than activities
+    full_list = (activities * ((days // len(activities)) + 1))[:days]
+
+    itinerary = [
+        f"Day {i+1}: {activity.title()} in {city.title()}" for i, activity in enumerate(full_list)
+    ]
 
     return itinerary
+
