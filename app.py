@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from utils import destinations, restaurants, get_destination_by_budget
+from utils import destinations, restaurants, get_destination_by_budget, generate_itinerary
 import random
 
 app = Flask(__name__)
@@ -82,10 +82,7 @@ def plan_trip():
     estimated_total = affordable_destinations[selected_dest] + (days * daily_cost)
 
     # Generate sample itinerary
-    itinerary = [
-        f"Day {i+1}: Experience {preference} activities in {selected_dest.title()}"
-        for i in range(days)
-    ]
+    itinerary = generate_itinerary(selected_dest, preference, days)
 
     # Pick restaurant based on destination
     restaurant_choice = random.choice(restaurants[selected_dest])
@@ -95,7 +92,7 @@ def plan_trip():
         "estimated_total_cost_eur": estimated_total,
         "restaurant": restaurant_choice,
         "itinerary": itinerary,
-        "message": f"Trip planned to {selected_dest.title()}!"
+        "message": f"Trip planned to {selected_dest.title()}! "
     })
 
 
